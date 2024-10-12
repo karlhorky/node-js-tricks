@@ -17,4 +17,4 @@ console.log(a);
 
 However, [this will fail if the file is contained within `node_modules`](https://github.com/nodejs/loaders/issues/217#issuecomment-2408585434) (as of Node.js 22.9.0).
 
-For these cases, consider [running the executable in Bun](https://github.com/karlhorky/bun-tricks#run-typescript-bin-executable-in-bun).
+For these cases, consider [running the executable in Bun](https://github.com/karlhorky/bun-tricks#run-typescript-bin-executable-in-bun) or [`tsx`](https://tsx.is/shell-scripts).
