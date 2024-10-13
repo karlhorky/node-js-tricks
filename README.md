@@ -17,4 +17,12 @@ console.log(a);
 
 However, [this will fail if the file is contained within `node_modules`](https://github.com/nodejs/typescript/issues/14) (as of Node.js 22.9.0).
 
-For these cases, consider [running the executable in Bun](https://github.com/karlhorky/bun-tricks#run-typescript-bin-executable-in-bun) or [`tsx`](https://tsx.is/shell-scripts).
+For running `.ts` files in `node_modules`, consider [`tsx`](https://tsx.is/shell-scripts):
+
+1. Add `tsx` to your project dependendencies
+2. Use `pnpm exec tsx` to execute your file using `tsx`
+   ```ts
+   #!/usr/bin/env -S pnpm exec tsx
+   ```
+
+Or alternatively, consider [running the executable in Bun](https://github.com/karlhorky/bun-tricks#run-typescript-bin-executable-in-bun).
