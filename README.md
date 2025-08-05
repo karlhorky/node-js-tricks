@@ -47,7 +47,6 @@ registerHooks({
           mode: "transform",
           sourceUrl: url,
         }),
-        shortCircuit: true,
       };
     }
 
