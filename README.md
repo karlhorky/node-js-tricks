@@ -4,7 +4,7 @@ A collection of useful Node.js tricks
 
 ## Run TypeScript `bin` executable in Node.js
 
-To use TypeScript in Node.js 22.6.0+ in [a `bin` executable](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#bin), use a shebang with [the `--experimental-strip-types` flag](https://nodejs.org/en/blog/release/v22.6.0#experimental-typescript-support-via-strip-types):
+To use TypeScript in Node.js >=v22.6.0 in [a `bin` executable](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#bin), use a shebang with [the `--experimental-strip-types` flag](https://nodejs.org/en/blog/release/v22.6.0#experimental-typescript-support-via-strip-types):
 
 `bin/index.ts`
 
@@ -15,7 +15,7 @@ const a: number = 1;
 console.log(a);
 ```
 
-However, [this will fail if the file is contained within `node_modules`](https://github.com/nodejs/typescript/issues/14) (as of Node.js 22.9.0).
+However, [this will fail if the file is contained within `node_modules`](https://github.com/nodejs/typescript/issues/14), confirmed with Node.js <=v22.18.0. This `node_modules` ban change in the future.
 
 For running `.ts` files in `node_modules`, consider [`tsx`](https://tsx.is/shell-scripts):
 
@@ -61,8 +61,14 @@ process.env.ISSUE_NUMBER is undefined
 });
 ```
 
-And then run it using Node.js v22.6.0+ type stripping ([the `--experimental-strip-types` flag](https://nodejs.org/en/blog/release/v22.6.0#experimental-typescript-support-via-strip-types)):
+And then run it using type stripping in [Node.js v22.18.0](https://nodejs.org/en/blog/release/v22.18.0) or later:
 
 ```bash
-$ node --experimental-strip-types __tests__/index.test.ts
+$ node __tests__/index.test.ts
+```
+
+To run the tests in watch mode, use the `--watch` flag:
+
+```bash
+$ node --watch __tests__/index.test.ts
 ```
