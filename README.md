@@ -17,22 +17,14 @@ console.log(a);
 
 However, [this will fail if the file is contained within `node_modules`](https://github.com/nodejs/typescript/issues/14), confirmed with Node.js <=v22.18.0. This `node_modules` ban change in the future.
 
-For running `.ts` files in `node_modules`, consider using a Bash script `bin` executable to strip types in `node_modules` on the fly using Node.js built-in type stripping support via [`registerHooks`](https://nodejs.org/api/module.html#moduleregisterhooksoptions) and [`stripTypeScriptTypes()`](https://nodejs.org/api/module.html#modulestriptypescripttypescode-options) from `node:module`:
+For running `.ts` files in `node_modules`, consider using a JavaScript `bin` executable to strip types in `node_modules` on the fly using Node.js built-in type stripping support via [`registerHooks`](https://nodejs.org/api/module.html#moduleregisterhooksoptions) and [`stripTypeScriptTypes()`](https://nodejs.org/api/module.html#modulestriptypescripttypescode-options) from `node:module`:
 
-`bin/index.sh`
+`bin/index.js`
 
-```bash
-#!/usr/bin/env bash
+```js
+#!/usr/bin/env node
 
-set -o errexit
-set -o nounset
-set -o pipefail
-
-exec node --disable-warning=ExperimentalWarning --input-type=module --eval '
-import { registerHooks, stripTypeScriptTypes } from "node:module";
-import { dirname, resolve } from "node:path";
-import { argv } from "node:process";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { registerHooks, stripTypeScriptTypes } from 'node:module';
 
 const tsRegex = /^file:.*(?<!\.d)\.m?ts$/;
 
@@ -42,11 +34,18 @@ registerHooks({
   load(url, context, nextLoad) {
     if (tsRegex.test(url)) {
       return {
-        format: "module",
-        source: stripTypeScriptTypes(nextLoad(url).source.toString(), {
-          mode: "transform",
-          sourceUrl: url,
-        }),
+        format: 'module',
+        source: stripTypeScriptTypes(
+          /** @type {import('node:module').ModuleSource} */ (
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string -- ModuleSource returns useful information from .toString()
+            nextLoad(url).source
+          ).toString(),
+          {
+            mode: 'transform',
+            sourceUrl: url,
+          },
+        ),
+        shortCircuit: true,
       };
     }
 
@@ -54,16 +53,8 @@ registerHooks({
   },
 });
 
-await import(
-  pathToFileURL(
-    resolve(
-      dirname(argv[1]),
-      // Path to entry point
-      "../src/index.ts",
-    ),
-  ).href
-);
-' "$0" "$@"
+// Path to entry point
+await import('../src/index.ts');
 ```
 
 Another option is [`tsx`](https://tsx.is/shell-scripts):
